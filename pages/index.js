@@ -1,10 +1,15 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import AppLayout from '../components/AppLayout';
+import Test from '../components/Test';
 
 const Home = () => {
+
     return (
-        <div>
-            Hi 
-        </div>
+        <>
+           <AppLayout>
+                <Test/>
+            </AppLayout>
+        </>
     );
 };
 
