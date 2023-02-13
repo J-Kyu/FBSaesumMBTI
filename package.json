@@ -1,0 +1,25 @@
+{
+  "name": "fsaesummbti",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "next dev -p 3000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/J-Kyu/FSaesumMBTI.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/J-Kyu/FSaesumMBTI/issues"
+  },
+  "homepage": "https://github.com/J-Kyu/FSaesumMBTI#readme",
+  "dependencies": {
+    "antd": "^5.2.0",
+    "next": "^13.1.6",
+    "styled-components": "^5.3.6"
+  }
+}
