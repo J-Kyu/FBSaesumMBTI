@@ -15,35 +15,20 @@ const AppLayout = ({children}) => {
 
     return (
         <>
-        {/* <Row>
-            <Layout>
-                <Col xs={24} md={3} style={{display:'flex', flexDirection:'row'}}>
-                        <SideBarComponent collapsed={collapsed} />
-                </Col>
-                <Col xs={24} md={21}>
+            <Layout hasSider='true' style={{minHeight: "100%"}}>
+                    <SideBarComponent collapsed={collapsed}  />
+                    <Layout>
                         <HeaderComponent  collapsed={collapsed} setCollapsed={setCollapsed}/>
-                        <Content>
-                            {children}
-                        </Content>
+                            <Content style={{minHeight:"50vh"}}>
+                                {children}
+                            </Content>
                         <FooterComponent/>
-                </Col>
-   
+                    </Layout>
             </Layout>
-        </Row> */}
-
-        <Layout>
-                <SideBarComponent collapsed={collapsed}  />
-                <Layout>
-                    <HeaderComponent  collapsed={collapsed} setCollapsed={setCollapsed}/>
-                        <Content>
-                            {children}
-                        </Content>
-                    <FooterComponent/>
-                </Layout>
-        </Layout>
-    </>
+        </>
     );
 };
+
 
 AppLayout.propTypes = {
     children: PropTypes.node.isRequired,
