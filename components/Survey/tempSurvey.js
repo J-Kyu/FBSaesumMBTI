@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { Form,Input, InputNumber, Popconfirm, Space, Table, Typography } from 'antd';
-
+import { QuestionCircleOutlined } from '@ant-design/icons';
 
 const originData = [];
 
@@ -14,6 +14,51 @@ for (let i = 0; i < 100; i++) {
 }
 
 
+//cell을 editing filed로 변환하게 하는 변수
+const EditableCell = ({
+    editing,
+    dataIndex,
+    title,
+    inputType,
+    record,
+    index,
+    children,
+    ...restProps
+  }) => {
+    const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+
+    if(editing == true){
+        return(
+            <>
+                <td {...restProps}>
+                    <Form.Item 
+                        name={dataIndex} 
+                        style={{ margin: 0,}}
+                        rules={[
+                            {
+                                required: true,
+                                message: `Please Input ${title}!`,
+                            },
+                        ]}>
+                        {inputNode}
+                    </Form.Item>
+                </td>
+            </>
+            
+        );
+    }
+    else{
+        return(
+            <>
+                <td {...restProps}>
+                    {children}
+                </td>
+
+            </>
+        );
+    }
+
+};
 
 
 const tempSurvey = () => {
@@ -27,6 +72,7 @@ const tempSurvey = () => {
     const cancel = () => {
         setEditingKey('');
     };
+
 
     /*
     Column에 대한 설정은 아래와 같이 2가지로 나눠서 설정한다.
@@ -59,21 +105,21 @@ const tempSurvey = () => {
         {
           title: 'operation',
           dataIndex: 'operation',
+          width: '30%',
           render: (_, record) => {
             
             const editable = isEditing(record);
             if (editable == true){
                 return (
                     // Eiditing
-                    <span>
-                        <Typography.Link style={{ marginRight: 8, }}>
-                            Save
-                        </Typography.Link>
-
-                        <Popconfirm title="Sure to cancel?" >
-                            <a>Cancel</a>
-                        </Popconfirm>
-                    </span>
+                    <SaveAndCancelComponent 
+                        record={record} 
+                        data={data} 
+                        setData={setData} 
+                        cancel={cancel} 
+                        setEditingKey={setEditingKey} 
+                        form={form} 
+                    />
                 );
             }
             else{
@@ -81,13 +127,18 @@ const tempSurvey = () => {
                 return (
                     <>
                         <Space size="middle">
-                            <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
-                                <a>Edit</a>
-                            </Typography.Link>
+                            <EditComponet 
+                                record={record} 
+                                form={form} 
+                                setEditingKey={setEditingKey} 
+                                editingKey={editingKey}
+                            />
 
-                            <Popconfirm title="Sure to Delete?" >
-                                <a>Delete</a>
-                            </Popconfirm>
+                            <RemoveComponent 
+                                record={record} 
+                                data={data} 
+                                setData={setData}
+                            />
                         </Space>
 
                     </>
@@ -123,11 +174,11 @@ const tempSurvey = () => {
 
             <Form form={form} component={false}>
                 <Table
-                    // components={{
-                    //     body: {
-                    //         cell: EditableCell,
-                    //     },
-                    // }}
+                    components={{
+                        body: {
+                            cell: EditableCell,
+                        },
+                    }}
                     bordered
                     dataSource={data}
                     columns={mergedColumns}
@@ -141,5 +192,115 @@ const tempSurvey = () => {
         </>
     );
 };
+
+
+const SaveAndCancelComponent = ({record, data, setData, cancel,setEditingKey, form}) =>{
+
+    //수정된 것을 적용 하거나, 생성된 것을 저장
+    const save = async (key) => {
+        try {
+            const row = await form.validateFields();
+            const newData = [...data];
+            const index = newData.findIndex((item) => key === item.key);
+            if (index > -1) {
+                const item = newData[index];
+                newData.splice(index, 1, {
+                    ...item,
+                    ...row,
+                });
+                setData(newData);
+                setEditingKey('');
+            } else {
+                newData.push(row);
+                setData(newData);
+                setEditingKey('');
+            }
+        } catch (errInfo) {
+            console.log('Validate Failed:', errInfo);
+        }
+    };
+
+    return (
+        <>
+            <span>
+                <Typography.Link style={{ marginRight: 8, }} onClick={() => save(record.key)} >
+                    Save
+                </Typography.Link>
+
+                <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+                    <a>Cancel</a>
+                </Popconfirm>
+            </span> 
+        </>
+    );
+
+
+};
+
+
+const EditComponet = ({record, form, setEditingKey, editingKey}) => {
+
+    const edit = (record) => {
+        form.setFieldsValue({
+          name: '',
+          age: '',
+          address: '',
+          ...record,
+        });
+        setEditingKey(record.key);
+    };
+
+
+    return(
+        <>
+            <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+                <a>Edit</a>
+            </Typography.Link>
+        </>
+    );
+
+
+};
+
+const RemoveComponent = ({record,data, setData}) =>{
+
+    const remove = async (key) => {
+        try {
+
+            const newData = [...data];
+            const index = newData.findIndex((item) => key === item.key);
+
+            //delete
+            newData.splice(index, 1);
+            setData(newData);
+
+
+        } catch (errInfo) {
+          console.log('Validate Failed:', errInfo);
+        }
+    };
+
+    return(
+        <>
+            <Popconfirm 
+                title="Delete the row"
+                description="Are you sure to delete this row?"
+                icon={
+                    <QuestionCircleOutlined
+                    style={{
+                        color: 'red',
+                    }}
+                    />
+                }
+                onConfirm={() => remove(record.key)}>
+
+                <a style={{color: "red"}}>Delete</a>
+            </Popconfirm>
+        </>
+    );
+};
+
+
+
 
 export default tempSurvey;
