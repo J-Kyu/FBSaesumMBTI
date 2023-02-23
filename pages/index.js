@@ -21,7 +21,6 @@ import {
   }
   from 'store/modules/contentState'
 import SurveyComponent from '@/components/Survey';
-import SurveyTableComponent from '@/components/Survey/SurveyTableComponent';
 
 
 
@@ -44,8 +43,6 @@ const ContentComponent = () => {
 
     switch(contentState.contentType){
         case CONTENT_TYPE_USER:  {
-            console.log("Rerender: "+contentState.ContentType);
-
             return (
                 <>
                     <UserComponent/>
