@@ -257,15 +257,18 @@ const SaveAndCancelComponent = ({record, data, setData, cancel,setEditingKey, fo
 
     return (
         <>
-            <span>
-                <Typography.Link style={{ marginRight: 8, }} onClick={() => save(record.key)} >
+            <Space size="middle">
+                {/* <Typography.Link style={{ marginRight: 8, }} onClick={() => save(record.key)} >
                     Save
-                </Typography.Link>
-
-                <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-                    <a>Cancel</a>
+                </Typography.Link> */}
+                <Popconfirm title="Sure to Save?" onConfirm={() => save(record.key)}>
+                    <a style={{color:"green"}}>Save</a>
                 </Popconfirm>
-            </span> 
+
+                <Typography.Link onClick={cancel} style={{color:"red"}}>
+                    Cancel
+                </Typography.Link>
+            </Space>
         </>
     );
 
