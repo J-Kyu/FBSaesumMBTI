@@ -1,125 +1,134 @@
 import React, {useState} from 'react';
-import { Form,Input, InputNumber, Popconfirm, Space, Table, Typography } from 'antd';
+import { Form,Input, InputNumber, Popconfirm, Space, Table, Typography, Select } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
-// const originData = [];
-
-// for (let i = 0; i < 100; i++) {
-//   originData.push({
-//     key: i.toString(),
-//     name: `Edrward ${i}`,
-//     age: 32,
-//     address: `London Park no. ${i}`,
-//   });
-// }
 
 
-//cell을 editing filed로 변환하게 하는 변수
-const EditableCell = ({
-    editing,
-    dataIndex,
-    title,
-    inputType,
-    record,
-    index,
-    children,
-    ...restProps
-  }) => {
-    const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
-
-    if(editing == true){
-        return(
-            <>
-                <td {...restProps}>
-                    <Form.Item 
-                        name={dataIndex} 
-                        style={{ margin: 0,}}
-                        rules={[
-                            {
-                                required: true,
-                                message: `Please Input ${title}!`,
-                            },
-                        ]}>
-                        {inputNode}
-                    </Form.Item>
-                </td>
-            </>
-            
-        );
-    }
-    else{
-        return(
-            <>
-                <td {...restProps}>
-                    {children}
-                </td>
-
-            </>
-        );
-    }
-
-};
 
 
-const tempSurvey = ({originData, columnData, opEdit, opDelete}) => {
-    console.log(columnData,opEdit,opDelete)
+const index = ({originData, columnData, options, opEdit=true, opDelete=true}) => {
 
     const [form] = Form.useForm();
     const [data, setData] = useState(originData);
     const [editingKey, setEditingKey] = useState('');
     const isEditing = (record) => record.key === editingKey;
 
-    const columns = [...columnData ,{
-        title: 'operation',
-        dataIndex: 'operation',
-        width: '30%',
-        render: (_, record) => {
-          
-          const editable = isEditing(record);
-          if (editable == true){
-              return (
-                  // Eiditing
-                  <SaveAndCancelComponent 
-                      record={record} 
-                      data={data} 
-                      setData={setData} 
-                      cancel={cancel} 
-                      setEditingKey={setEditingKey} 
-                      form={form} 
-                  />
-              );
-          }
-          else{
-              // Not Editing
-              return (
-                  <>
-                      <Space size="middle">
-                          <EditComponet 
-                              record={record} 
-                              form={form} 
-                              setEditingKey={setEditingKey} 
-                              editingKey={editingKey}
-                              opEdit={opEdit}
-                          />
+    const columns = [...columnData ,
+        {
+            title: 'operation',
+            dataIndex: 'operation',
+            width: '30%',
+            render: (_, record) => {
+            
+            const editable = isEditing(record);
+            if (editable == true){
+                return (
+                    // Eiditing
+                    <SaveAndCancelComponent 
+                        record={record} 
+                        data={data} 
+                        setData={setData} 
+                        cancel={cancel} 
+                        setEditingKey={setEditingKey} 
+                        form={form} 
+                    />
+                );
+            }
+            else{
+                // Not Editing
+                return (
+                    <>
+                        <Space size="middle">
+                            <EditComponet 
+                                record={record} 
+                                form={form} 
+                                setEditingKey={setEditingKey} 
+                                editingKey={editingKey}
+                                opEdit={opEdit}
+                            />
 
-                          <RemoveComponent 
-                              record={record} 
-                              data={data} 
-                              setData={setData}
-                              opDelete={opDelete}
-                          />
-                      </Space>
+                            <RemoveComponent 
+                                record={record} 
+                                data={data} 
+                                setData={setData}
+                                opDelete={opDelete}
+                            />
+                        </Space>
 
-                  </>
-                  
-              );
-          }
+                    </>
+                    
+                );
+            }
 
+            },
         },
-      },]
+    ]
 
     const cancel = () => {
         setEditingKey('');
+    };
+
+    //cell을 editing filed로 변환하게 하는 변수
+    const EditableCell = ({
+        editing,
+        dataIndex,
+        title,
+        inputType,
+        record,
+        index,
+        children,
+        ...restProps
+    }) => {
+        // const inputNode = inputType === 'number' ? <InputNumber /> : <Input />;
+
+        var inputNode = null;
+
+        switch(inputType){
+            case 'select': {
+                inputNode = <Select options={options}/>;
+                break;
+            }
+            case 'number': {
+                inputNode = <InputNumber /> ;
+                break;
+            }
+            default :{
+                inputNode = <Input /> ;
+                break;
+            }
+        }
+
+        if(editing == true){
+            return(
+                <>
+                    <td {...restProps}>
+                        <Form.Item 
+                            name={dataIndex} 
+                            style={{ margin: 0,}}
+                            rules={[
+                                {
+                                    required: true,
+                                    message: `Please Input ${title}!`,
+                                },
+                            ]}>
+                            {inputNode}
+                        </Form.Item>
+                    </td>
+                </>
+                
+            );
+        }
+        else{
+            return(
+                <>
+                    <td {...restProps}>
+                        {children}
+                    </td>
+
+                </>
+            );
+        }
+
     };
 
 
@@ -133,7 +142,7 @@ const tempSurvey = ({originData, columnData, opEdit, opDelete}) => {
           ...col,
           onCell: (record) => ({
             record,
-            inputType: col.dataIndex === 'age' ? 'number' : 'text',
+            inputType: col.dataType,
             dataIndex: col.dataIndex,
             title: col.title,
             editing: isEditing(record),
@@ -157,10 +166,6 @@ const tempSurvey = ({originData, columnData, opEdit, opDelete}) => {
                     dataSource={data}
                     columns={mergedColumns}
                     rowClassName="editable-row"
-                    
-                    pagination={{
-                        onChange: cancel,
-                    }}
                 />
             </Form>
         </>
@@ -285,7 +290,4 @@ const RemoveComponent = ({record,data, setData, opDelete}) =>{
     );
 };
 
-
-
-
-export default tempSurvey;
+export default index;

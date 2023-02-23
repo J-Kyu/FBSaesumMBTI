@@ -1,46 +1,54 @@
 import React, {useState} from 'react';
 import { Form,Input, InputNumber, Popconfirm, Table, Typography } from 'antd';
-import TempSurvey from './tempSurvey';
+import CRUDComponent from 'components/CRUDComponent';
 
-const originData = [];
-for (let i = 0; i < 100; i++) {
-  originData.push({
-    key: i.toString(),
-    name: `Edrward ${i}`,
-    age: 32,
-    address: `London Park no. ${i}`,
-  });
-}
+
+
+const surveyData = [
+  {
+    id: '1036',
+    key: '1',
+    title: "새섬 MBTI",
+    expandable: true,
+  },
+  {
+  id: '1037',
+  key: '2',
+  title: "test",
+  expandable: false,
+  }
+];
 
 
 const SurveyComponent = () => {
 
-  const abc = [
+  const surveyFormatData = [
+    
     {
-      title: 'name',
-      dataIndex: 'name',
-    //   width: '25%',
-      editable: true,
+      title: 'ID',
+      dataIndex: 'id',
+      width: '10%',
+      editable: false,
     },
     {
-      title: 'age',
-      dataIndex: 'age',
-    //   width: '15%',
+      title: 'Survey Title',
+      dataIndex: 'title',
       editable: true,
     },
-    {
-      title: 'address',
-      dataIndex: 'address',
-    //   width: '40%',
-      editable: true,
-    }];
+  ];
+
+
+
 
   return (
     <>
-      <TempSurvey originData={originData} columnData={abc}  opEdit={false} opDelete={true}/>
+      {/* <CRUDComponent originData={originData} columnData={columnData}  opEdit={false} opDelete={true}/> */}
+
+      <CRUDComponent originData={surveyData} columnData={surveyFormatData}  opEdit={true} opDelete={true} opView={true}/>
     </>
   );
 
 };
+
 
 export default SurveyComponent;
