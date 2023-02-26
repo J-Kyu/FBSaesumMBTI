@@ -1,9 +1,12 @@
-import React from 'react';
-import CRUDComponent from 'components/CRUDComponent';
+import React, {useEffect, useState} from 'react';
 import OneSelectCRUDComponent from 'components/CRUDComponent/OneSelectCRUDComponent';
+
+import axios from 'axios';
 
 
 const QuestionComponet = () => {
+
+    const [data, setData] = useState([]);
 
     const questionListData = [
         {
@@ -106,11 +109,64 @@ const QuestionComponet = () => {
         }
     ];
 
+
+
+
+    useEffect(() => {
+        questionPageRequestAPI(0,10, setData);
+    },[]);
+
+    useEffect(() => {
+        console.log(data)
+    },[data]);
+
+
+    if (data.length == 0){
+        return (
+        <>
+            Loading
+        </>
+        );
+    }
+
     return (
         <div>
-                <OneSelectCRUDComponent originData={questionListData} columnData={questionFormatData} options={QuestionType} opEdit={true} opDelete={true} />
+                <OneSelectCRUDComponent originData={data} columnData={questionFormatData} options={QuestionType} opEdit={true} opDelete={true} />
         </div>
     );
 };
+
+
+
+
+const questionPageRequestAPI = (page, count, setData) => {
+
+    var url = "http://api.gettoknow.life/v1/admin/api/survey/question/"+page+"/"+count+"/paging";
+
+    axios.get(url)
+        .then((response)=> {
+
+            console.log(response);
+
+            response.data.questionDTOList.forEach((element, index) => {
+                setData(prev => [
+                    ...prev,
+                    {
+                        id: index,
+                        key: index,
+                        questionContents: element.questionContents,
+                        questionType: element.questionType,
+                    }                    
+                ]);
+            });
+
+        })
+        .catch((error)=> {
+            console.log(error);
+        })
+}
+
+
+
 
 export default QuestionComponet;

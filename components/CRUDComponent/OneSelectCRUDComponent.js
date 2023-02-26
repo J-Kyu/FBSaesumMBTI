@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Form,Input, InputNumber, Popconfirm, Space, Table, Typography, Select } from 'antd';
 import { QuestionCircleOutlined } from '@ant-design/icons';
 
@@ -12,6 +12,11 @@ const index = ({originData, columnData, options, opEdit=true, opDelete=true}) =>
     const [data, setData] = useState(originData);
     const [editingKey, setEditingKey] = useState('');
     const isEditing = (record) => record.key === editingKey;
+    
+    useEffect(() =>{
+        console.log('-------<');
+        console.log(data);
+    },[data]);
 
     const columns = [...columnData ,
         {
